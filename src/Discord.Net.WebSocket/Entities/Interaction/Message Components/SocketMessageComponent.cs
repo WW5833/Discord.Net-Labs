@@ -184,11 +184,15 @@ namespace Discord.WebSocket
             return await InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options);
         }
 
-        public override Task AcknowledgeAsync(RequestOptions options = null)
+        public override Task AcknowledgeAsync(RequestOptions options = null, bool ephemeral = false)
         {
             var response = new API.InteractionResponse()
             {
                 Type = InteractionResponseType.DeferredUpdateMessage,
+                Data = new API.InteractionApplicationCommandCallbackData
+                {
+                    Flags = ephemeral ? 64 : 0
+                },
             };
 
             return Discord.Rest.ApiClient.CreateInteractionResponse(response, this.Id, this.Token, options);

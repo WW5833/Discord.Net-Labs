@@ -105,8 +105,18 @@ namespace Discord.WebSocket
 
             if (ephemeral)
                 response.Data.Value.Flags = 64;
-
+                
             await InteractionHelper.SendInteractionResponse(this.Discord, this.Channel, response, this.Id, Token, options);
+            /*try
+            {
+                return await InteractionHelper.SendInteractionResponse(this.Discord, this.Channel, response, this.Id, Token, options);
+            }
+            catch(System.Exception ex)
+            {
+                if (ephemeral)
+                    return null;
+                throw;
+            }*/
         }
 
         /// <inheritdoc/>

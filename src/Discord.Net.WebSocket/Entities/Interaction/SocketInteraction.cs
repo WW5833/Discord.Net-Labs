@@ -148,11 +148,15 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A task that represents the asynchronous operation of acknowledging the interaction.
         /// </returns>
-        public virtual Task AcknowledgeAsync(RequestOptions options = null)
+        public virtual Task AcknowledgeAsync(RequestOptions options = null, bool ephemeral = false)
         {
             var response = new API.InteractionResponse()
             {
                 Type = InteractionResponseType.DeferredChannelMessageWithSource,
+                Data = new API.InteractionApplicationCommandCallbackData
+                {
+                    Flags = ephemeral ? 64 : 0
+                },
             };
 
             return Discord.Rest.ApiClient.CreateInteractionResponse(response, this.Id, this.Token, options);
