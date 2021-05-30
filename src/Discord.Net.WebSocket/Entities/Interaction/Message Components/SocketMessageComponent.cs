@@ -50,6 +50,11 @@ namespace Discord.WebSocket
             {
                 if (this.Message == null)
                 {
+                    if (!model.Message.Value.Author.IsSpecified)
+                    {
+                        Console.WriteLine("NO AUTHOR ID");
+                        return;
+                    }
                     SocketUser author = null;
                     if (this.Channel is SocketGuildChannel channel)
                     {

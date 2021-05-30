@@ -73,7 +73,7 @@ namespace Discord.WebSocket
         internal int? HandlerTimeout { get; private set; }
         internal bool AlwaysAcknowledgeInteractions { get; private set; }
 
-        internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
+        public new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
         /// <inheritdoc />
