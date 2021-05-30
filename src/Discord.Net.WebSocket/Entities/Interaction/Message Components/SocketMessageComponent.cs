@@ -148,6 +148,16 @@ namespace Discord.WebSocket
                 response.Data.Value.Flags = 64;
 
             await InteractionHelper.SendInteractionResponse(this.Discord, this.Channel, response, this.Id, Token, options);
+            /*try
+            {
+                return await InteractionHelper.SendInteractionResponse(this.Discord, this.Channel, response, this.Id, Token, options);
+            }
+            catch(System.Exception ex)
+            {
+                if (ephemeral)
+                    return null;
+                throw;
+            }*/
         }
 
         /// <summary>
@@ -185,8 +195,16 @@ namespace Discord.WebSocket
 
             if (ephemeral)
                 args.Flags = 64;
-
-            return await InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options);
+            try
+            {
+                return await InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options);
+            }
+            catch (System.Exception ex)
+            {
+                if (ephemeral)
+                    return null;
+                throw;
+            }
         }
 
         public override Task AcknowledgeAsync(RequestOptions options = null, bool ephemeral = false)
