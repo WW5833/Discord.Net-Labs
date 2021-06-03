@@ -220,5 +220,21 @@ namespace Discord.WebSocket
 
             return Discord.Rest.ApiClient.CreateInteractionResponse(response, this.Id, this.Token, options);
         }
+
+        public async Task UpdateAsync(string text = null, Embed embed = null,
+            RequestOptions options = null, MessageComponent component = null)
+        {
+            if (!IsValidToken)
+                throw new InvalidOperationException("Interaction token is no longer valid");
+
+            await this.Discord.ApiClient.SendJsonAsync("PATCH", $"webhooks/{this.Discord.ApiClient.CurrentUserId.Value}/{this.Token}/messages/@original", new
+            {
+                content = text,
+                components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
+                embeds = embed != null
+                    ? new API.Embed[] { embed.ToModel() }
+                    : Optional<API.Embed[]>.Unspecified
+            }, options: options);
+        }
     }
 }
