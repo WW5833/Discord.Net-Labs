@@ -4,37 +4,6 @@ using System.Linq;
 
 namespace Discord.Rest
 {
-    public static class PublicEntityExtensions
-    {
-        public static object ToModelPublic(this Embed entity)
-        {
-            if (entity == null)
-                return null;
-            var model = new API.Embed
-            {
-                Type = entity.Type,
-                Title = entity.Title,
-                Description = entity.Description,
-                Url = entity.Url,
-                Timestamp = entity.Timestamp,
-                Color = entity.Color?.RawValue
-            };
-            if (entity.Author != null)
-                model.Author = entity.Author.Value.ToModel();
-            model.Fields = entity.Fields.Select(x => x.ToModel()).ToArray();
-            if (entity.Footer != null)
-                model.Footer = entity.Footer.Value.ToModel();
-            if (entity.Image != null)
-                model.Image = entity.Image.Value.ToModel();
-            if (entity.Provider != null)
-                model.Provider = entity.Provider.Value.ToModel();
-            if (entity.Thumbnail != null)
-                model.Thumbnail = entity.Thumbnail.Value.ToModel();
-            if (entity.Video != null)
-                model.Video = entity.Video.Value.ToModel();
-            return model;
-        }
-    }
     internal static class EntityExtensions
     {
         public static IEmote ToIEmote(this API.Emoji model)

@@ -7,6 +7,7 @@ using Model = Discord.API.Interaction;
 using DataModel = Discord.API.MessageComponentInteractionData;
 using Newtonsoft.Json.Linq;
 using Discord.Rest;
+using Discord.Net;
 
 namespace Discord.WebSocket
 {
@@ -227,14 +228,17 @@ namespace Discord.WebSocket
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
 
-            await this.Discord.ApiClient.SendJsonAsync("PATCH", $"webhooks/{this.Discord.ApiClient.CurrentUserId.Value}/{this.Token}/messages/@original", new
+            var args = new API.Rest.CreateWebhookMessageParams(text)
             {
-                content = text,
-                components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
-                embeds = embed != null
-                    ? new API.Embed[] { embed.ToModel() }
-                    : Optional<API.Embed[]>.Unspecified
-            }, options: options);
+                IsTTS = false,
+                Embeds = embed != null
+                        ? new API.Embed[] { embed.ToModel() }
+                        : Optional<API.Embed[]>.Unspecified,
+                Components = component?.Components.Where(x => x != null).Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
+            };
+
+            await this.Discord.ApiClient.SendJsonAsync("PATCH", $"webhooks/{(await this.Discord.GetApplicationInfoAsync()).Id}/{this.Token}/messages/@original", args, options: options
+                , bucketId: BucketId.Create("PATCH", $"webhooks/{(await this.Discord.GetApplicationInfoAsync()).Id}/{this.Token}/messages/@original", new Dictionary<string, string>()));
         }
     }
 }
