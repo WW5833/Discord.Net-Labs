@@ -221,24 +221,5 @@ namespace Discord.WebSocket
 
             return Discord.Rest.ApiClient.CreateInteractionResponse(response, this.Id, this.Token, options);
         }
-
-        public async Task UpdateAsync(string text = null, Embed embed = null,
-            RequestOptions options = null, MessageComponent component = null)
-        {
-            if (!IsValidToken)
-                throw new InvalidOperationException("Interaction token is no longer valid");
-
-            var args = new API.Rest.CreateWebhookMessageParams(text)
-            {
-                IsTTS = false,
-                Embeds = embed != null
-                        ? new API.Embed[] { embed.ToModel() }
-                        : Optional<API.Embed[]>.Unspecified,
-                Components = component?.Components.Where(x => x != null).Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
-            };
-
-            await this.Discord.ApiClient.SendJsonAsync("PATCH", $"webhooks/{(await this.Discord.GetApplicationInfoAsync()).Id}/{this.Token}/messages/@original", args, options: options
-                , bucketId: BucketId.Create("PATCH", $"webhooks/{(await this.Discord.GetApplicationInfoAsync()).Id}/{this.Token}/messages/@original", new Dictionary<string, string>()));
-        }
     }
 }
