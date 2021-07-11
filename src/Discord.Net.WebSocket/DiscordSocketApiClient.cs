@@ -16,14 +16,14 @@ using GameModel = Discord.API.Game;
 
 namespace Discord.API
 {
-    public class DiscordSocketApiClient : DiscordRestApiClient
+    internal class DiscordSocketApiClient : DiscordRestApiClient
     {
-        internal event Func<GatewayOpCode, Task> SentGatewayMessage { add { _sentGatewayMessageEvent.Add(value); } remove { _sentGatewayMessageEvent.Remove(value); } }
+        public event Func<GatewayOpCode, Task> SentGatewayMessage { add { _sentGatewayMessageEvent.Add(value); } remove { _sentGatewayMessageEvent.Remove(value); } }
         private readonly AsyncEvent<Func<GatewayOpCode, Task>> _sentGatewayMessageEvent = new AsyncEvent<Func<GatewayOpCode, Task>>();
-        internal event Func<GatewayOpCode, int?, string, object, Task> ReceivedGatewayEvent { add { _receivedGatewayEvent.Add(value); } remove { _receivedGatewayEvent.Remove(value); } }
+        public event Func<GatewayOpCode, int?, string, object, Task> ReceivedGatewayEvent { add { _receivedGatewayEvent.Add(value); } remove { _receivedGatewayEvent.Remove(value); } }
         private readonly AsyncEvent<Func<GatewayOpCode, int?, string, object, Task>> _receivedGatewayEvent = new AsyncEvent<Func<GatewayOpCode, int?, string, object, Task>>();
 
-        internal event Func<Exception, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
+        public event Func<Exception, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
 
         private readonly bool _isExplicitUrl;
@@ -36,11 +36,11 @@ namespace Discord.API
 
         internal IWebSocketClient WebSocketClient { get; }
 
-        internal ConnectionState ConnectionState { get; private set; }
+        public ConnectionState ConnectionState { get; private set; }
 
-        internal DiscordSocketApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, string userAgent,
+        public DiscordSocketApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, string userAgent,
             string url = null, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null,
-			bool useSystemClock = true)
+            bool useSystemClock = true)
             : base(restClientProvider, userAgent, defaultRetryMode, serializer, useSystemClock)
         {
             _gatewayUrl = url;
@@ -181,10 +181,12 @@ namespace Discord.API
             if (WebSocketClient == null)
                 throw new NotSupportedException("This client is not configured with WebSocket support.");
 
-            if (ConnectionState == ConnectionState.Disconnected) return;
+            if (ConnectionState == ConnectionState.Disconnected)
+                return;
             ConnectionState = ConnectionState.Disconnecting;
 
-            try { _connectCancelToken?.Cancel(false); }
+            try
+            { _connectCancelToken?.Cancel(false); }
             catch { }
 
             if (ex is GatewayReconnectException)
@@ -196,7 +198,7 @@ namespace Discord.API
         }
 
         //Core
-        internal Task SendGatewayAsync(GatewayOpCode opCode, object payload, RequestOptions options = null)
+        public Task SendGatewayAsync(GatewayOpCode opCode, object payload, RequestOptions options = null)
             => SendGatewayInternalAsync(opCode, payload, options);
         private async Task SendGatewayInternalAsync(GatewayOpCode opCode, object payload, RequestOptions options)
         {
@@ -215,7 +217,7 @@ namespace Discord.API
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
 
-        internal async Task SendIdentifyAsync(int largeThreshold = 100, int shardID = 0, int totalShards = 1, GatewayIntents gatewayIntents = GatewayIntents.AllUnprivileged, (UserStatus, bool, long?, GameModel)? presence = null, RequestOptions options = null)
+        public async Task SendIdentifyAsync(int largeThreshold = 100, int shardID = 0, int totalShards = 1, GatewayIntents gatewayIntents = GatewayIntents.AllUnprivileged, (UserStatus, bool, long?, GameModel)? presence = null, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
             var props = new Dictionary<string, string>
@@ -264,7 +266,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
             await SendGatewayAsync(GatewayOpCode.Heartbeat, lastSeq, options: options).ConfigureAwait(false);
         }
-        internal async Task SendStatusUpdateAsync(UserStatus status, bool isAFK, long? since, GameModel game, RequestOptions options = null)
+        public async Task SendStatusUpdateAsync(UserStatus status, bool isAFK, long? since, GameModel game, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
             var args = new StatusUpdateParams
