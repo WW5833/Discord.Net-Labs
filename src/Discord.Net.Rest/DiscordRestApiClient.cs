@@ -1013,7 +1013,12 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendJsonAsync<GuildApplicationCommandPermission>("PUT", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}/permissions", permissions, new BucketIds(), options: options).ConfigureAwait(false);
+            var toSend = new
+            {
+                permissions = permissions
+            };
+
+            return await SendJsonAsync<GuildApplicationCommandPermission>("PUT", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}/permissions", toSend, new BucketIds(), options: options).ConfigureAwait(false);
         }
 
         public async Task<IReadOnlyCollection<GuildApplicationCommandPermission>> BatchModifyApplicationCommandPermissions(ModifyGuildApplicationCommandPermissions[] permissions, ulong guildId, RequestOptions options = null)
